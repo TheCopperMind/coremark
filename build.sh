@@ -1,0 +1,1 @@
+riscv32-unknown-elf-gcc -march=rv32im -mabi=ilp32 -Iriscv64-baremetal -v  -fno-inline-small-functions -S riscv64-baremetal/core_portme.c core_list_join.c core_main.c core_matrix.c core_state.c core_util.c

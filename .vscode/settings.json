@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "stdio.h": "c",
+        "coremark.h": "c",
+        "cmath": "c",
+        "threading.h": "c"
+    }
+}

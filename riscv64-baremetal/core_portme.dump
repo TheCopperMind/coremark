@@ -1,0 +1,153 @@
+
+riscv64-baremetal/core_portme.o:     file format elf64-littleriscv
+
+Contents of section .text:
+ 0000 01458280 8280f327 00c01707 00002330  .E.....'......#0
+ 0010 f7008280 f32700c0 17070000 2330f700  .....'......#0..
+ 0020 82801705 00000335 05009707 000083b7  .......5........
+ 0030 07001d8d 82805375 35d29707 000087b7  ......Su5.......
+ 0040 07005375 f51a8280 85472300 f5008280  ..Su.....G#.....
+ 0050 23000500 8280                        #.....          
+Contents of section .srodata.cst8:
+ 0000 00000000 65cdcd41                    ....e..A        
+Contents of section .sdata:
+ 0000 01000000 66000000                    ....f...        
+Contents of section .comment:
+ 0000 00474343 3a202867 32656535 65343330  .GCC: (g2ee5e430
+ 0010 30313829 2031322e 322e3000           018) 12.2.0.    
+Contents of section .riscv.attributes:
+ 0000 41380000 00726973 63760001 2e000000  A8...riscv......
+ 0010 04100572 76363469 3270305f 6d327030  ...rv64i2p0_m2p0
+ 0020 5f613270 305f6632 70305f64 3270305f  _a2p0_f2p0_d2p0_
+ 0030 63327030 0008010a 0b                 c2p0.....       
+
+Disassembly of section .text:
+
+0000000000000000 <portable_malloc>:
+   0:	4501                	li	a0,0
+   2:	8082                	ret
+
+0000000000000004 <portable_free>:
+   4:	8082                	ret
+
+0000000000000006 <start_time>:
+   6:	c00027f3          	rdcycle	a5
+   a:	00000717          	auipc	a4,0x0
+   e:	00f73023          	sd	a5,0(a4) # a <start_time+0x4>
+  12:	8082                	ret
+
+0000000000000014 <stop_time>:
+  14:	c00027f3          	rdcycle	a5
+  18:	00000717          	auipc	a4,0x0
+  1c:	00f73023          	sd	a5,0(a4) # 18 <stop_time+0x4>
+  20:	8082                	ret
+
+0000000000000022 <get_time>:
+  22:	00000517          	auipc	a0,0x0
+  26:	00053503          	ld	a0,0(a0) # 22 <get_time>
+  2a:	00000797          	auipc	a5,0x0
+  2e:	0007b783          	ld	a5,0(a5) # 2a <get_time+0x8>
+  32:	8d1d                	sub	a0,a0,a5
+  34:	8082                	ret
+
+0000000000000036 <time_in_secs>:
+  36:	d2357553          	fcvt.d.lu	fa0,a0
+  3a:	00000797          	auipc	a5,0x0
+  3e:	0007b787          	fld	fa5,0(a5) # 3a <time_in_secs+0x4>
+  42:	1af57553          	fdiv.d	fa0,fa0,fa5
+  46:	8082                	ret
+
+0000000000000048 <portable_init>:
+  48:	4785                	li	a5,1
+  4a:	00f50023          	sb	a5,0(a0)
+  4e:	8082                	ret
+
+0000000000000050 <portable_fini>:
+  50:	00050023          	sb	zero,0(a0)
+  54:	8082                	ret
+
+Disassembly of section .srodata.cst8:
+
+0000000000000000 <.LC0>:
+   0:	0000                	unimp
+   2:	0000                	unimp
+   4:	cd65                	beqz	a0,fc <portable_fini+0xac>
+   6:	41cd                	li	gp,19
+
+Disassembly of section .sbss:
+
+0000000000000000 <stop_time_val>:
+	...
+
+0000000000000008 <start_time_val>:
+	...
+
+0000000000000010 <seed5_volatile>:
+  10:	0000                	unimp
+	...
+
+0000000000000014 <seed4_volatile>:
+  14:	0000                	unimp
+	...
+
+0000000000000018 <seed2_volatile>:
+  18:	0000                	unimp
+	...
+
+000000000000001c <seed1_volatile>:
+  1c:	0000                	unimp
+	...
+
+Disassembly of section .sdata:
+
+0000000000000000 <default_num_contexts>:
+   0:	0001                	nop
+	...
+
+0000000000000004 <seed3_volatile>:
+   4:	0066                	c.slli	zero,0x19
+	...
+
+Disassembly of section .comment:
+
+0000000000000000 <.comment>:
+   0:	4700                	lw	s0,8(a4)
+   2:	203a4343          	fmadd.s	ft6,fs4,ft3,ft4,rmm
+   6:	6728                	ld	a0,72(a4)
+   8:	6532                	ld	a0,264(sp)
+   a:	3565                	addiw	a0,a0,-7
+   c:	3465                	addiw	s0,s0,-7
+   e:	31303033          	.4byte	0x31303033
+  12:	2938                	fld	fa4,80(a0)
+  14:	3120                	fld	fs0,96(a0)
+  16:	2e32                	fld	ft8,264(sp)
+  18:	2e32                	fld	ft8,264(sp)
+  1a:	0030                	addi	a2,sp,8
+
+Disassembly of section .riscv.attributes:
+
+0000000000000000 <.riscv.attributes>:
+   0:	3841                	addiw	a6,a6,-16
+   2:	0000                	unimp
+   4:	7200                	ld	s0,32(a2)
+   6:	7369                	lui	t1,0xffffa
+   8:	01007663          	bgeu	zero,a6,14 <.riscv.attributes+0x14>
+   c:	002e                	c.slli	zero,0xb
+   e:	0000                	unimp
+  10:	1004                	addi	s1,sp,32
+  12:	7205                	lui	tp,0xfffe1
+  14:	3676                	fld	fa2,376(sp)
+  16:	6934                	ld	a3,80(a0)
+  18:	7032                	.2byte	0x7032
+  1a:	5f30                	lw	a2,120(a4)
+  1c:	326d                	addiw	tp,tp,-5 # fffffffffffe0ffb <portable_fini+0xfffffffffffe0fab>
+  1e:	3070                	fld	fa2,224(s0)
+  20:	615f 7032 5f30      	.byte	0x5f, 0x61, 0x32, 0x70, 0x30, 0x5f
+  26:	3266                	fld	ft4,120(sp)
+  28:	3070                	fld	fa2,224(s0)
+  2a:	645f 7032 5f30      	.byte	0x5f, 0x64, 0x32, 0x70, 0x30, 0x5f
+  30:	30703263          	.4byte	0x30703263
+  34:	0800                	addi	s0,sp,16
+  36:	0a01                	addi	s4,s4,0
+  38:	0b              	Address 0x0000000000000038 is out of bounds.
+
