@@ -12,6 +12,7 @@
 #define CSR_THREAD_ADDRESS      0x9C0
 #define CSR_THREAD_WDATA        0x9C1
 #define CSR_THREAD_COMMAND      0x9C2
+#define CSR_PTHREAD_YIELD       0x9C3
 #define CSR_THREAD_RDATA        0xDC0
 #define CSR_CURRENT_VTHREAD_ID  0xDC1
 
@@ -52,20 +53,6 @@ int get_current_thread_id()
     return csr_read(0xDC1);
 }
 
-void _thread_start()
-{
-    int thread_id = csr_read(0xDC1);
-    int start_address_stack = ((int)&_ram_start + (1+thread_id) * (int)&_thread_mem_size);
-    int start_address_tls   = start_address_stack - (int)&_thread_mem_size;
-    // set our own stack and thread pointer
-    __asm__ __volatile__ ("add sp,zero, %0": : "r"(start_address_stack));
-    __asm__ __volatile__ ("add tp,zero, %0": : "r"(start_address_tls));
-    __asm__ __volatile__ ("addi sp,sp,-4");
-    // set args
-    __asm__ __volatile__ ("mv a0, %0": : "r"(thread_args[thread_id]));
-    __asm__ __volatile__ ("jalr zero, %0" : : "r"(initial_pc[thread_id]));
-    return;
-}
 
 void update_table(int vthread_id, int data, int command)
 {
@@ -73,22 +60,7 @@ void update_table(int vthread_id, int data, int command)
     csr_write(0x9C1,    data);
     csr_write(0x9C2,    command);
 }
-int spawn_thread(int vthread_id, int pc, int prio, void* args)
-{
-    // acquire thread lock
-    while(!csr_read(0xBC0)){}
-    // set thread's PC
-    initial_pc[vthread_id]  = pc;
-    // set arguments
-    thread_args[vthread_id] = args;
-    update_table(vthread_id, (int) &_thread_start, TABLE_WRITE_PC);
-    // set thread's priority
-    update_table(vthread_id, prio, TABLE_WRITE_PRIORITY);
-    //set its state to runnable
-    update_table(vthread_id, RUNNABLE, TABLE_WRITE_STATE);
-    // release thread lock
-    csr_read(0xBC0);
-}
+
 int yield()
 {
     // acquire thread lock
@@ -109,7 +81,6 @@ void exit_thread()
     update_table(vthread_id, HALTED, TABLE_WRITE_STATE);
     // release thread lock
     csr_read(0xBC0);
-
 }
 int join_thread(int vthread_id)
 {
@@ -129,6 +100,40 @@ int join_thread(int vthread_id)
         //csr_write(0x9C3, 1);
     }
     return 0;
+}
+
+void _thread_start()
+{
+    int thread_id = csr_read(0xDC1);
+    int start_address_stack = ((int)&_ram_start + (1+thread_id) * (int)&_thread_mem_size);
+    int start_address_tls   = start_address_stack - (int)&_thread_mem_size;
+    // set our own stack and thread pointer
+    __asm__ __volatile__ ("add sp,zero, %0": : "r"(start_address_stack));
+    __asm__ __volatile__ ("add tp,zero, %0": : "r"(start_address_tls));
+    __asm__ __volatile__ ("addi sp,sp,-4");
+    // set args
+    __asm__ __volatile__ ("mv a0, %0": : "r"(thread_args[thread_id]));
+    __asm__ __volatile__ ("jalr ra, %0" : : "r"(initial_pc[thread_id]));
+    __asm__ __volatile__ ("jalr ra, %0" : : "r"(&exit_thread));
+    while(1);
+}
+
+
+int spawn_thread(int vthread_id, int pc, int prio, void* args)
+{
+    // acquire thread lock
+    while(!csr_read(0xBC0)){}
+    // set thread's PC
+    initial_pc[vthread_id]  = pc;
+    // set arguments
+    thread_args[vthread_id] = args;
+    update_table(vthread_id, (int) &_thread_start, TABLE_WRITE_PC);
+    // set thread's priority
+    update_table(vthread_id, prio, TABLE_WRITE_PRIORITY);
+    //set its state to runnable
+    update_table(vthread_id, RUNNABLE, TABLE_WRITE_STATE);
+    // release thread lock
+    csr_read(0xBC0);
 }
 
 

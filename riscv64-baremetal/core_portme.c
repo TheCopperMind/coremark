@@ -19,8 +19,7 @@ Original Author: Shay Gal-on
 #include "core_portme.h"
 #include "lib/csr.h"
 
-// int spawn_thread(int vthread_id, int pc, int prio, void* args);
-// int join_thread(int vthread_id);
+
 
 #if VALIDATION_RUN
 volatile ee_s32 seed1_volatile = 0x3415;
@@ -67,6 +66,7 @@ barebones_clock()
 
 /** Define Host specific (POSIX), or target specific global time variables. */
 static CORETIMETYPE start_time_val, stop_time_val;
+static int vthread_id, prio;
 
 /* Function : start_time
         This function will be called right before starting the timed portion of
@@ -149,6 +149,8 @@ portable_init(core_portable *p, int *argc, char *argv[])
         ee_printf("ERROR! Please define ee_u32 to a 32b unsigned type!\n");
     }
     p->portable_id = 1;
+    prio = 1;
+    vthread_id = 1;
     return;
 }
 /* Function : portable_fini
@@ -160,25 +162,24 @@ portable_fini(core_portable *p)
     p->portable_id = 0;
 }
 
-// int vthread_id = 1;
-// int prio = 1;
-// ee_u8
-// core_start_parallel(core_results *res)
-// {
-//     void* arg = res;
-//     spawn_thread(vthread_id, (int)&iterate, prio, arg);
-//     res->port.thread_id = vthread_id;
-//     vthread_id++;
-//     return vthread_id;
-// }
-// ee_u8
-// core_stop_parallel(core_results *res)
-// {
-//     void *retval;
-//     int join_id = res->port.thread_id;
-//     join_thread(join_id);
-//     return join_id;
-// }
+
+ee_u8
+core_start_parallel(core_results *res)
+{
+    void* arg = res;
+    spawn_thread(vthread_id, (int)&iterate, prio, arg);
+    res->port.thread_id = vthread_id;
+    vthread_id++;
+    return vthread_id;
+}
+ee_u8
+core_stop_parallel(core_results *res)
+{
+    void *retval;
+    int join_id = res->port.thread_id;
+    join_thread(join_id);
+    return join_id;
+}
 
 ee_s32 portme_sys1()
 {

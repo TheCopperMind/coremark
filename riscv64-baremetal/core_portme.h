@@ -149,7 +149,7 @@ typedef ee_u32 CORE_TICKS;
    and <core_end_parallel> in <core_portme.c>, to fit a particular architecture.
 */
 #ifndef MULTITHREAD
-#define MULTITHREAD     1
+#define MULTITHREAD     2
 #define USE_SCTHREAD    1
 #define USE_PTHREAD     0
 #define USE_FORK        0
@@ -210,6 +210,9 @@ void portable_fini(core_portable *p);
 #endif
 
 int ee_printf(const char *fmt, ...);
+
+int spawn_thread(int vthread_id, int pc, int prio, void* args);
+int join_thread(int vthread_id);
 
 ee_s32 portme_sys1();
 ee_s32 portme_sys2();

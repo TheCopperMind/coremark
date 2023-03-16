@@ -362,9 +362,9 @@ for (i = 0; i < MULTITHREAD; i++)
     }
     total_errors += check_data_types();
     /* and report results */
-    ee_printf("Executed LIST %d, MATRIX %d, STATE %d \n", results[0].execs & ID_LIST, results[0].execs & ID_MATRIX, results[0].execs & ID_STATE);
-    ee_printf("Iterations       : %d", results[0].iterations);
-    ee_printf("Contexts         : %d", default_num_contexts);
+    //see_printf("Executed LIST %d, MATRIX %d, STATE %d \n", results[0].execs & ID_LIST, results[0].execs & ID_MATRIX, results[0].execs & ID_STATE);
+    //ee_printf("Iterations       : %d", results[0].iterations);
+    //ee_printf("Contexts         : %d", default_num_contexts);
     ee_printf("CoreMark Size    : %lu\n", (long unsigned)results[0].size);
     ee_printf("Total ticks      : %lu\n", (long unsigned)total_time);
 #if HAS_FLOAT
@@ -389,12 +389,12 @@ for (i = 0; i < MULTITHREAD; i++)
 
     ee_printf("Iterations       : %d\n",
               default_num_contexts * results[0].iterations);
-    ee_printf("Compiler version : %s\n", COMPILER_VERSION);
-    ee_printf("Compiler flags   : %s\n", COMPILER_FLAGS);
+    //ee_printf("Compiler version : %s\n", COMPILER_VERSION);
+    //ee_printf("Compiler flags   : %s\n", COMPILER_FLAGS);
 #if (MULTITHREAD > 1)
     ee_printf("Parallel %s : %d\n", PARALLEL_METHOD, default_num_contexts);
 #endif
-    ee_printf("Memory location  : %s\n", MEM_LOCATION);
+    //ee_printf("Memory location  : %s\n", MEM_LOCATION);
     /* output for verification */
     ee_printf("seedcrc          : 0x%04x\n", seedcrc);
     if (results[0].execs & ID_LIST)

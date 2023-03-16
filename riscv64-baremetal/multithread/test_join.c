@@ -9,8 +9,7 @@ void do_work(void* args)
   
   char *quotePtr = args;
   thread_print(quotePtr);
-  
-  exit_thread();
+  return;
 }
 int main(){
     char quote[] = "Hello, world!";
@@ -18,10 +17,10 @@ int main(){
     {
       spawn_thread(i, (int) &do_work, 1, (void*)quote);
     }
-    // for(int i=1; i<10;i++)
-    // {
-    //   join(i);
-    // }
+    for(int i=1; i<NUM_THREADS;i++)
+    {
+      join_thread(i);
+    }
 
     do_work(quote);
 

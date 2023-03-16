@@ -11,7 +11,7 @@ MEMORY
 }
 
 /* Define stack size and heap size */
-_thread_mem_size = LENGTH(RAM) / 2;
+_thread_mem_size = LENGTH(RAM) / 3;
 __STACK_SIZE = _thread_mem_size / 2;
 __stack_size = __STACK_SIZE;
 heap_size  = 0;
